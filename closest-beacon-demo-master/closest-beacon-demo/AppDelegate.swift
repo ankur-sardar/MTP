@@ -1,4 +1,10 @@
-
+//
+//  AppDelegate.swift
+//  closest-beacon-demo
+//
+//  Created by Will Dages on 10/11/14.
+//  @willdages on Twitter
+//
 
 import UIKit
 

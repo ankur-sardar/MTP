@@ -4,33 +4,35 @@
 
 var PORT = 10000;
 var express = require('express');
-var redis = require('redis');
+//var redis = require('redis');
 var app = express();
 
 require('dns').lookup(require('os').hostname(), function (err, add, fam) {
     console.log('Server IP addr: ' + add);
 })
 
-var redisClient = redis.createClient();
-redisClient.on('connect', function() {
-    console.log('redisClient connected');
-});
+//var redisClient = redis.createClient();
+//redisClient.on('connect', function() {
+//    console.log('redisClient connected');
+//});
 
 app.get('/', function(req, res) {
     res.send('Hello!');
 })
 
-app.get('/rec/:rid/:bid', function(req, res) {
+app.get('/rec/:rid', function(req, res) {
     var rid = req.params.rid; // reader ID
-    var bid = req.params.bid; // beacon ID
+//    var bid = req.params.bid; // beacon ID
+})
+/*
     var timestamp = new Date();
-    console.log(bid);
+    console.log(rid);
     var d = timestamp.getDate();  
     var m = timestamp.getMonth() + 1;
     var y = timestamp.getYear() + 1900;
     var h = timestamp.getHours();
     var keyIn = bid + '-' + y + '-' + m + '-' + d; // key to store the in-time of a particular BID
-    
+/*    
     // Storing the In-time details with the key of bid-yy-mm-dd format
     redisClient.exists(keyIn, function(err, reply) {
         if (reply === 1) {
@@ -139,7 +141,9 @@ app.get('/rec/:rid/:bid', function(req, res) {
     });
     redisClient.lrange(keyAcessTime, 0, -1, function(err, p) {
         console.log('access-List: ' + p);
+
     });
+
 });
 
 
@@ -258,7 +262,8 @@ var j = schedule.scheduleJob(rule, function() {
         }
     });
 });
-
+*/
 var server = app.listen(PORT, function() {
     console.log('Server is running at Port ' + PORT);
 });
+
