@@ -17,6 +17,7 @@ redisClient.on('connect', function() {
 });
 
 app.get('/', function(req, res) {
+    console.log('Hello!')
     res.send('Hello!');
 })
 
@@ -141,124 +142,6 @@ app.get('/rec/:rid/:bid', function(req, res) {
         console.log('access-List: ' + p);
     });
 });
-
-
-var schedule = require('node-schedule');
-
-// set up the schedule, it will run everyday at 23:55 hrs
-
-var rule = new schedule.RecurrenceRule();
-rule.hour = 23;
-rule.minute = 55;
-var j = schedule.scheduleJob(rule, function() {    
-    var fs = require('fs');
-    var data = fs.readFileSync('employee.csv', 'utf8'); // reading beaconId from a csv file
-    var beacon = data.split(/[\r\n]+/);
-    var key = [];
-    for (i = 0; i < beacon.length; i++) {
-        var temp = beacon[i].split(',');
-        key[i] = temp[1];
-    }
-
-    var timestamp = new Date();
-    var d = timestamp.getDate();
-    var m = timestamp.getMonth() + 1;
-    var y = timestamp.getYear() + 1900;   
-    var file_name = y + '-' + m + '-' + d + '.csv';
-    var file_name_1 = 'Details-access-time-' + file_name;
-    var n = key.length;
-
-    for (i = 0; i < n-1; i ++) {
-        // getting the employee_id from the database
-        redisClient.get(key[i], function(error, result) {
-            if (error) {
-                console.log('Error: '+ error);
-            }
-            else {
-                console.log('Details: ' + result);
-                var data = fs.appendFile(file_name, result + ',' , 'utf8' , function(error) {
-                    if (error) {
-                        throw error;
-                    }
-                    console.log(key + ' Employee Id written');
-                });
-                var data = fs.appendFile(file_name_1, result + ',', 'utf8', function(error) {
-                    if (error) {
-                        throw error;
-                    }
-                    console.log('Employee Id written in both files');
-                });
-            }
-        });
-
-        var key1 = key[i] + '-' + y + '-' + m + '-' + d;
-        // Getting the In-time details
-        redisClient.get(key1, function(error, result) {
-            if (error) {
-                console.log('Error: '+ error);
-            }
-            else {
-                console.log('Details: ' + result);
-                var data = fs.appendFile(file_name, result + ',' , 'utf8' , function(error) {
-                    if (error) {
-                        throw error;
-                    }
-                    console.log(key + ' In time written');
-                });
-                console.log('First line done');
-            }
-        });
-        // getting the Out-time details
-        var key2 = key1 + '-out';
-        redisClient.get(key2, function(error, result) {
-            if (error) {
-                console.log('Error: ' + error);
-            }
-            else {
-                var data = fs.appendFile(file_name, result + '\n' , 'utf8' , function(error) {
-                    if (error) { 
-                        throw error;
-                    }    
-                    console.log(key + ' Out Time written');
-                });
-            }
-        });
-        // getting the Access Time details
-        var key3 = key1 + '-access-time';
-        redisClient.lrange(key3, 0, -1, function(err, result) {
-            console.log( 'details acess: ' + result);
-            var data = fs.appendFile(file_name_1, result + '\n', 'utf8');
-        });
-    }
-
-    var nodemailer = require('nodemailer');
-    var transporter = nodemailer.createTransport({
-        host: 'web1.uievolution.co.jp',
-        port: 25,
-        auth: {
-            user: 'mailer',
-            pass: '6U8MBKNS'
-        }
-    });
-
-    var mailOptions = {
-        from: 'asardar@uievolution.com',
-        to: 'asardar@uievolution.com',
-        subject: 'Daily Attandance Sheet',
-        text: 'A CSV file is attached with this Email',
-        attachments: [ {'path' : file_name}, {'path' : file_name_1} ]                     
-    };
-
-    transporter.sendMail(mailOptions, function(error, info) {
-        if (error) {
-            console.log(error);
-        }
-        else {
-            console.log('Message Sent: ' + info.response);
-        }
-    });
-});
-
 var server = app.listen(PORT, function() {
     console.log('Server is running at Port ' + PORT);
 });
