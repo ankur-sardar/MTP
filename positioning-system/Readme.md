@@ -31,8 +31,3 @@ The follwing points must be followed in order to start the system.
 * Run the *server.js* file through the terminal.
 * Open the browser and go to http://127.0.0.1:10000/ to visualize the position of the employees.
 * When everything is done, run the *generate-record.js* file to write the data into a csv file.
-
-
-
-
-Copyright © UIEvolution, Inc. All Rights Reserved.
